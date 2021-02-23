@@ -50,17 +50,14 @@ def getImgLink(link):
     r.raise_for_status
     html = r.text
 
-    # soup = bs(html,'html.parser') 
-
     ptn = re.compile('https://cdn(\d).iconfinder.com/data/icons/(.*?).png')
-    link_match = re.search(ptn,html) # 应该用search...正则写的是对的，在re的理解上还不够啊~。。 search不需要从字符串开头开始搜索
+    link_match = re.search(ptn,html) # 此处使用search.不需要从字符串开头开始搜索
     print(link_match.group(0))
     return link_match.group(0)
 
-    # <img src="https://cdn2.iconfinder.com/data/icons/(.*?).png" 一般是第一个
+    # <img src="https://cdn(\d).iconfinder.com/data/icons/(.*?).png" 第一个
     
-def saveToLocal(ImgUrl):
-    path = "F:/DevelopmentAndMarketingIcon/"
+def saveToLocal(ImgUrl,path):
     fileName = ImgUrl.split("/")[-1]
     print("====  Got file name:  " + fileName + "   ====")
     fullPath = path + fileName
@@ -71,26 +68,23 @@ def saveToLocal(ImgUrl):
             print("目录不存在，已建立新目录")
         # 检查图片是否存在 不存在则爬取图片
         if not os.path.exists(fullPath):
-            r = requests.get(imgUrl)
+            r = requests.get(ImgUrl)
             with open(fullPath,'wb') as f:
                 f.write(r.content) # 写入所爬取图片的二进制数据
                 f.close()
-                print("图片已保存,文件名%s" %fileName)
+                print("图片已保存,文件名 %s" %fileName)
         else:
             print("文件已存在")
-    except:
+    except Exception as e:
+        print(repr(e))
         print("爬取失败")
 
+def downloadAll(aurl,apath):
+    allLinks = ParserLinks(aurl)     # 获取所有子连接
+    linksCount = len(allLinks)
+    for i in range(0,linksCount):
+        print("共%d个,第%d个" %(linksCount,i+1))
+        imgUrl = getImgLink(allLinks[i])
+        saveToLocal(imgUrl,apath)
 
-
-allLinks = ParserLinks("https://www.iconfinder.com/iconsets/webina-seo-development-and-marketing")     # 获取所有子连接
-linksCount = len(allLinks)
-for i in range(0,linksCount):
-    print("共%d个,第%d个" %(linksCount,i+1))
-    imgUrl = getImgLink(allLinks[i])
-    saveToLocal(imgUrl)
-
-
-# print(allLinks[0])
-# imgUrl = getImgLink(allLinks[0])
-# saveToLocal(imgUrl)
+downloadAll("https://www.iconfinder.com/iconsets/flat-icons-web",'F:/FlatWebIcons/')
