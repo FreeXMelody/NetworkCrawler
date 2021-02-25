@@ -13,7 +13,8 @@
 > 如果对于代码有什么好建议或有更好的实现欢迎提issues，共同进步呀。
 
 ### 实战列表
-|      Python      |  C#  |
-| :--------------: | :--: |
-| [IconFinderSpider](./PythonCrawler/IconFinderSpider.py) |      |
+|                        项目名称                         |  语言  |        描述        |
+| :-----------------------------------------------------: | :----: | :----------------: |
+| [IconFinderSpider](./PythonCrawler/IconFinderSpider.py) | Python | IconFinder图片抓取 |
+|      [gtImgExport](./PythonCrawler/gtImgExport.py)      | Python | QQ表情提取、到本地 |
 
