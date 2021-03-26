@@ -3,6 +3,7 @@ import os
 import re
 
 import json
+import sys
 
 def GetGroupLink(imgGroupID):
     # 提供图片组ID
@@ -31,7 +32,7 @@ def getImgID(jsonData):
     imgsData = jsonData['imgs']
     imgCount = len(imgsData)
     for i in range(0,imgCount):
-        idDict.append(imgsData[i]['id'])
+        idDict.append(imgsData[i]['id'])    # 应该是字典套列表
     return idDict
 
 ####  抓取图片  ####
@@ -43,7 +44,7 @@ def getImgLink(imgID):
 
 def saveToLocal(ImgUrl,path):
     fileName = ImgUrl.split("/")[-2] + ".png"
-    print("====  Got file name:  " + fileName + "   ====")
+    # print("====  Got file name:  " + fileName + "   ====")
     fullPath = path + fileName
     try:
         # 检查目录是否存在
@@ -65,7 +66,7 @@ def saveToLocal(ImgUrl,path):
 
 
 def main():
-    link = GetGroupLink("204096")   # 更改图片组 ID 即可
+    link = GetGroupLink(sys.argv[1])   # 更改图片组 ID 即可
 
     html = GetHtml(link)
     jsonData = parserJSON(html) # dict
@@ -75,7 +76,7 @@ def main():
 
     for i in IDs:
         imgUrl = getImgLink(i)
-        saveToLocal(imgUrl,'F:/SWEETIE BUNNY/')
+        saveToLocal(imgUrl,sys.argv[2])
 
 
 main()

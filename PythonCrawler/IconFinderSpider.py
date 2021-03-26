@@ -2,6 +2,7 @@ import requests
 import re
 
 import os
+import sys
 
 # 初始化，获取网页源码
 def init(url):
@@ -52,20 +53,19 @@ def getImgLink(link):
 
     ptn = re.compile('https://cdn(\d).iconfinder.com/data/icons/(.*?).png')
     link_match = re.search(ptn,html) # 此处使用search.不需要从字符串开头开始搜索
-    print(link_match.group(0))
     return link_match.group(0)
 
     # <img src="https://cdn(\d).iconfinder.com/data/icons/(.*?).png" 第一个
     
 def saveToLocal(ImgUrl,path):
     fileName = ImgUrl.split("/")[-1]
-    print("====  Got file name:  " + fileName + "   ====")
+    # print("====  Got file name:  " + fileName + "   ====") # debug
     fullPath = path + fileName
     try:
         # 检查 保存图片的目录 是否存在
         if not os.path.exists(path):
             os.mkdir(path)
-            print("目录不存在，已建立新目录")
+            print("📁 目录不存在，已建立新目录")
         # 检查图片是否存在 不存在则爬取图片
         if not os.path.exists(fullPath):
             r = requests.get(ImgUrl)
@@ -74,7 +74,7 @@ def saveToLocal(ImgUrl,path):
                 f.close()
                 print("图片已保存,文件名 %s" %fileName)
         else:
-            print("文件已存在")
+            print("文件已存在 🔒")
     except Exception as e:
         print(repr(e))
         print("爬取失败")
@@ -87,4 +87,14 @@ def downloadAll(aurl,apath):
         imgUrl = getImgLink(allLinks[i])
         saveToLocal(imgUrl,apath)
 
-downloadAll("https://www.iconfinder.com/iconsets/flat-icons-web",'F:/FlatWebIcons/')
+def main():
+    url = str(sys.argv[1])
+    path = str(sys.argv[2])
+    downloadAll(url,path)
+    yesOrNo = input("✔️ 爬取完成啦，是否打开目录查看？(y) \n")
+    if yesOrNo == "y":
+        os.startfile(path)
+    else:
+        sys.exit
+
+main()
