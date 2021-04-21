@@ -55,17 +55,19 @@ def getImgLink(link):
     link_match = re.search(ptn,html) # 此处使用search.不需要从字符串开头开始搜索
     return link_match.group(0)
 
-    # <img src="https://cdn(\d).iconfinder.com/data/icons/(.*?).png" 第一个
+    # <img src="https://cdn(\d).iconfinder.com/data/icons/(.*?).png" 1st
     
 def saveToLocal(ImgUrl,path):
     fileName = ImgUrl.split("/")[-1]
-    # print("====  Got file name:  " + fileName + "   ====") # debug
+    # 路径修正
+    if path[-1] != '\\':
+        path += '\\'
     fullPath = path + fileName
     try:
         # 检查 保存图片的目录 是否存在
         if not os.path.exists(path):
             os.mkdir(path)
-            print("📁 目录不存在，已建立新目录")
+            print("📁 检测目录不存在，已建立新目录")
         # 检查图片是否存在 不存在则爬取图片
         if not os.path.exists(fullPath):
             r = requests.get(ImgUrl)
