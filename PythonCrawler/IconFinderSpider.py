@@ -4,6 +4,9 @@ import re
 import os
 import sys
 
+from requests.api import request
+from lxml import etree # etree模块，可用于解析xpath
+
 # 初始化，获取网页源码
 def init(url):
     headers = {
@@ -46,11 +49,7 @@ def ParserLinks(url):
 
 # 获取图片链接
 def getImgLink(link):
-    r = requests.get(link)
-    r.encoding = r.apparent_encoding
-    r.raise_for_status
-    html = r.text
-
+    html = init(link)
     ptn = re.compile('https://cdn(\d).iconfinder.com/data/icons/(.*?).png')
     link_match = re.search(ptn,html) # 此处使用search.不需要从字符串开头开始搜索
     return link_match.group(0)
@@ -67,7 +66,7 @@ def saveToLocal(ImgUrl,path):
         # 检查 保存图片的目录 是否存在
         if not os.path.exists(path):
             os.mkdir(path)
-            print("📁 检测目录不存在，已建立新目录")
+            print("📁 已建立新目录..")
         # 检查图片是否存在 不存在则爬取图片
         if not os.path.exists(fullPath):
             r = requests.get(ImgUrl)
@@ -82,12 +81,20 @@ def saveToLocal(ImgUrl,path):
         print("爬取失败")
 
 def downloadAll(aurl,apath):
-    allLinks = ParserLinks(aurl)     # 获取所有子连接
+    # use icon-set's name as folder's name 
+    # need to crawl the main page
+    # REVIEW : titile [ folder's name ]
+    mPage = init(aurl)
+    # build a xpath obj
+    html = etree.HTML(mPage)
+    
+    preName = html.xpath('/html/body/header/div/div[1]/h1/text()')
+    allLinks = ParserLinks(aurl)     # all sub-links
     linksCount = len(allLinks)
     for i in range(0,linksCount):
         print("共%d个,第%d个" %(linksCount,i+1))
         imgUrl = getImgLink(allLinks[i])
-        saveToLocal(imgUrl,apath)
+        saveToLocal(imgUrl,apath+ '\\' + preName[0])
 
 def main():
     url = str(sys.argv[1])
